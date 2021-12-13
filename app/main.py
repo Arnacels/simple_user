@@ -7,6 +7,7 @@ from starlette.responses import JSONResponse
 from api.api_v1 import api_router
 from common.settings import settings
 from common import exceptions
+from common.services.logs_creator import LogsCreator
 from utils.templates import templates
 
 app = FastAPI(
@@ -21,6 +22,17 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+@app.middleware("http")
+async def add_process_time_header(request: Request, call_next):
+    response = await call_next(request)
+    service = LogsCreator(
+        request=request,
+        response=response
+    )
+    await service.execute()
+    return response
 
 app.mount("/static",
           StaticFiles(directory=settings.STATIC_DIR, html=True),

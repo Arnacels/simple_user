@@ -5,7 +5,7 @@ from pydantic import BaseModel, EmailStr, Field
 
 
 class BaseUser(BaseModel):
-    name: str = Field(min_length=1, max_length=50)
+    name: str = Field(min_length=1, max_length=50, regex=r'[a-z A-Z\.]+')
     email: EmailStr
 
 
